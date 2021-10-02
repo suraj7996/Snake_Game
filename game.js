@@ -2,7 +2,7 @@
 
 var canvas = document.getElementById("snake");
 var ctx = canvas.getContext("2d");
-console.log(canvas);
+// console.log(canvas);
 
 const grid = 32;
 
@@ -26,6 +26,31 @@ let food = {
     y : Math.floor(Math.random()*15+1) * grid
 }
 
+let d;
+document.addEventListener("keydown",(e)=>{
+    let k = e.keyCode;
+    if(k == 37 && d!= "right"){
+        d = "left"
+    }else if(k == 38 && d!= "down"){
+        d="up"
+    }else if(k == 39 && d!= "left"){
+        d="right"
+    }else if(k == 40 && d!= "up"){
+        d="down"
+    }
+    console.log(d);
+    
+})
+
+function collision(head,array){
+    for(let i=0; i < array.length; i++){
+        if(head.x == array[i].x && head.y ==array[i].y){
+            return true;
+        }
+    }
+    return false;
+}
+
 function draw()
 {
     ctx.drawImage(g,0,0);
@@ -40,6 +65,37 @@ function draw()
     }
 
     ctx.drawImage(foodImg, food.x, food.y);
+    let snakeX = snake[0].x;
+    let snakeY = snake[0].y;
+
+    if(d=="left") snakeX -= grid;
+    if(d=="up") snakeY -= grid;
+    if(d=="right") snakeX += grid;
+    if(d=="down") snakeY += grid;
+
+    
+
+    if(snakeX == food.x && snakeY == food.y){
+        food = {
+            x : Math.floor(Math.random()*17+1) * grid,
+            y : Math.floor(Math.random()*15+1) * grid
+        }
+    }else{
+        snake.pop();
+    }
+
+    let newpos = {
+        x : snakeX,
+        y : snakeY
+    }
+
+    if(snakeX < grid || snakeX > 17 * grid || snakeY < grid || snakeY > 15 * grid ||
+        collision(newpos, snake)){
+        clearInterval(game);
+    }
+
+    snake.unshift(newpos);
+
 }
 
 var game = setInterval(draw,100);
